@@ -2,8 +2,8 @@ const { createWriteStream, existsSync, mkdirSync, mkdtemp } = require("fs");
 const { join, sep } = require("path");
 const { spawnSync } = require("child_process");
 const { tmpdir } = require("os");
+const { Readable } = require("node:stream");
 
-const axios = require("axios");
 const rimraf = require("rimraf");
 const tmpDir = tmpdir();
 
@@ -72,7 +72,7 @@ class Package {
     return true;
   }
 
-  install(fetchOptions, suppressLogs = false) {
+  install(suppressLogs = false) {
     if (this.exists()) {
       if (!suppressLogs) {
         console.error(
@@ -92,12 +92,15 @@ class Package {
       console.error(`Downloading release from ${this.url}`);
     }
 
-    return axios({ ...fetchOptions, url: this.url, responseType: "stream" })
+    return fetch(this.url)
       .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Failed to download: ${res.status} ${res.statusText}`);
+        }
         return new Promise((resolve, reject) => {
           mkdtemp(`${tmpDir}${sep}`, (err, directory) => {
             let tempFile = join(directory, this.filename);
-            const sink = res.data.pipe(createWriteStream(tempFile));
+            const sink = Readable.fromWeb(res.body).pipe(createWriteStream(tempFile));
             sink.on("error", (err) => reject(err));
             sink.on("close", () => {
               if (/\.tar\.*/.test(this.zipExt)) {
@@ -178,9 +181,9 @@ class Package {
       });
   }
 
-  run(binaryName, fetchOptions) {
+  run(binaryName) {
     const promise = !this.exists()
-      ? this.install(fetchOptions, true)
+      ? this.install(true)
       : Promise.resolve();
 
     promise
