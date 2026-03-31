@@ -2734,7 +2734,7 @@ class Package {
     return true;
   }
 
-  install(fetchOptions, suppressLogs = false) {
+  install(suppressLogs = false) {
     if (this.exists()) {
       if (!suppressLogs) {
         console.error(
@@ -2754,7 +2754,7 @@ class Package {
       console.error(`Downloading release from ${this.url}`);
     }
 
-    return axios({ ...fetchOptions, url: this.url, responseType: "stream" })
+    return axios({ url: this.url, responseType: "stream" })
       .then((res) => {
         return new Promise((resolve, reject) => {
           mkdtemp(`${tmpDir}${sep}`, (err, directory) => {
@@ -2840,9 +2840,9 @@ class Package {
       });
   }
 
-  run(binaryName, fetchOptions) {
+  run(binaryName) {
     const promise = !this.exists()
-      ? this.install(fetchOptions, true)
+      ? this.install(true)
       : Promise.resolve();
 
     promise
@@ -2878,7 +2878,6 @@ const { Package } = require("./binary-install");
 const os = require("os");
 const cTable = require("console.table");
 const libc = require("detect-libc");
-const { configureProxy } = require("axios-proxy-builder");
 
 const error = (msg) => {
   console.error(msg);
@@ -2985,16 +2984,14 @@ const install = (suppressLogs) => {
     return;
   }
   const package = getPackage();
-  const proxy = configureProxy(package.url);
 
-  return package.install(proxy, suppressLogs);
+  return package.install(suppressLogs);
 };
 
 const run = (binaryName) => {
   const package = getPackage();
-  const proxy = configureProxy(package.url);
 
-  package.run(binaryName, proxy);
+  package.run(binaryName);
 };
 
 module.exports = {
@@ -3020,7 +3017,6 @@ install(false);
       },
       "dependencies": {
         "axios": "^1.13.5",
-        "axios-proxy-builder": "^0.1.2",
         "console.table": "^0.10.0",
         "detect-libc": "^2.1.2",
         "rimraf": "^6.1.3"
@@ -3037,15 +3033,6 @@ install(false);
       "name": "@axodotdev/axolotlsay",
       "version": "0.2.2"
     },
-    "node_modules/@isaacs/cliui": {
-      "engines": {
-        "node": ">=18"
-      },
-      "integrity": "sha512-AokJm4tuBHillT+FpMtxQ60n8ObyXBatq7jD2/JA9dxbDDokKQm8KMht5ibGzLVU9IJDIKK4TPKgMHEYMn3lMg==",
-      "license": "BlueOak-1.0.0",
-      "resolved": "https://registry.npmjs.org/@isaacs/cliui/-/cliui-9.0.0.tgz",
-      "version": "9.0.0"
-    },
     "node_modules/asynckit": {
       "integrity": "sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==",
       "license": "MIT",
@@ -3056,45 +3043,33 @@ install(false);
       "dependencies": {
         "follow-redirects": "^1.15.11",
         "form-data": "^4.0.5",
-        "proxy-from-env": "^1.1.0"
+        "proxy-from-env": "^2.1.0"
       },
-      "integrity": "sha512-cz4ur7Vb0xS4/KUN0tPWe44eqxrIu31me+fbang3ijiNscE129POzipJJA6zniq2C/Z6sJCjMimjS8Lc/GAs8Q==",
+      "integrity": "sha512-3Y8yrqLSwjuzpXuZ0oIYZ/XGgLwUIBU3uLvbcpb0pidD9ctpShJd43KSlEEkVQg6DS0G9NKyzOvBfUtDKEyHvQ==",
       "license": "MIT",
-      "resolved": "https://registry.npmjs.org/axios/-/axios-1.13.5.tgz",
-      "version": "1.13.5"
-    },
-    "node_modules/axios-proxy-builder": {
-      "dependencies": {
-        "tunnel": "^0.0.6"
-      },
-      "integrity": "sha512-6uBVsBZzkB3tCC8iyx59mCjQckhB8+GQrI9Cop8eC7ybIsvs/KtnNgEBfRMSEa7GqK2VBGUzgjNYMdPIfotyPA==",
-      "license": "MIT",
-      "resolved": "https://registry.npmjs.org/axios-proxy-builder/-/axios-proxy-builder-0.1.2.tgz",
-      "version": "0.1.2"
+      "resolved": "https://registry.npmjs.org/axios/-/axios-1.14.0.tgz",
+      "version": "1.14.0"
     },
     "node_modules/balanced-match": {
-      "dependencies": {
-        "jackspeak": "^4.2.3"
-      },
       "engines": {
-        "node": "20 || >=22"
+        "node": "18 || 20 || >=22"
       },
-      "integrity": "sha512-x0K50QvKQ97fdEz2kPehIerj+YTeptKF9hyYkKf6egnwmMWAkADiO0QCzSp0R5xN8FTZgYaBfSaue46Ej62nMg==",
+      "integrity": "sha512-BLrgEcRTwX2o6gGxGOCNyMvGSp35YofuYzw9h1IMTRmKqttAZZVU67bdb9Pr2vUHA8+j3i2tJfjO6C6+4myGTA==",
       "license": "MIT",
-      "resolved": "https://registry.npmjs.org/balanced-match/-/balanced-match-4.0.2.tgz",
-      "version": "4.0.2"
+      "resolved": "https://registry.npmjs.org/balanced-match/-/balanced-match-4.0.4.tgz",
+      "version": "4.0.4"
     },
     "node_modules/brace-expansion": {
       "dependencies": {
         "balanced-match": "^4.0.2"
       },
       "engines": {
-        "node": "20 || >=22"
+        "node": "18 || 20 || >=22"
       },
-      "integrity": "sha512-Pdk8c9poy+YhOgVWw1JNN22/HcivgKWwpxKq04M/jTmHyCZn12WPJebZxdjSa5TmBqISrUSgNYU3eRORljfCCw==",
+      "integrity": "sha512-VZznLgtwhn+Mact9tfiwx64fA9erHH/MCXEUfB/0bX/6Fz6ny5EGTXYltMocqg4xFAQZtnO3DHWWXi8RiuN7cQ==",
       "license": "MIT",
-      "resolved": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-5.0.2.tgz",
-      "version": "5.0.2"
+      "resolved": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-5.0.5.tgz",
+      "version": "5.0.5"
     },
     "node_modules/call-bind-apply-helpers": {
       "dependencies": {
@@ -3326,20 +3301,20 @@ install(false);
     },
     "node_modules/glob": {
       "dependencies": {
-        "minimatch": "^10.2.0",
-        "minipass": "^7.1.2",
-        "path-scurry": "^2.0.0"
+        "minimatch": "^10.2.2",
+        "minipass": "^7.1.3",
+        "path-scurry": "^2.0.2"
       },
       "engines": {
-        "node": "20 || >=22"
+        "node": "18 || 20 || >=22"
       },
       "funding": {
         "url": "https://github.com/sponsors/isaacs"
       },
-      "integrity": "sha512-/g3B0mC+4x724v1TgtBlBtt2hPi/EWptsIAmXUx9Z2rvBYleQcsrmaOzd5LyL50jf/Soi83ZDJmw2+XqvH/EeA==",
+      "integrity": "sha512-Wjlyrolmm8uDpm/ogGyXZXb1Z+Ca2B8NbJwqBVg0axK9GbBeoS7yGV6vjXnYdGm6X53iehEuxxbyiKp8QmN4Vw==",
       "license": "BlueOak-1.0.0",
-      "resolved": "https://registry.npmjs.org/glob/-/glob-13.0.3.tgz",
-      "version": "13.0.3"
+      "resolved": "https://registry.npmjs.org/glob/-/glob-13.0.6.tgz",
+      "version": "13.0.6"
     },
     "node_modules/gopd": {
       "engines": {
@@ -3392,29 +3367,14 @@ install(false);
       "resolved": "https://registry.npmjs.org/hasown/-/hasown-2.0.2.tgz",
       "version": "2.0.2"
     },
-    "node_modules/jackspeak": {
-      "dependencies": {
-        "@isaacs/cliui": "^9.0.0"
-      },
-      "engines": {
-        "node": "20 || >=22"
-      },
-      "funding": {
-        "url": "https://github.com/sponsors/isaacs"
-      },
-      "integrity": "sha512-ykkVRwrYvFm1nb2AJfKKYPr0emF6IiXDYUaFx4Zn9ZuIH7MrzEZ3sD5RlqGXNRpHtvUHJyOnCEFxOlNDtGo7wg==",
-      "license": "BlueOak-1.0.0",
-      "resolved": "https://registry.npmjs.org/jackspeak/-/jackspeak-4.2.3.tgz",
-      "version": "4.2.3"
-    },
     "node_modules/lru-cache": {
       "engines": {
         "node": "20 || >=22"
       },
-      "integrity": "sha512-ESL2CrkS/2wTPfuend7Zhkzo2u0daGJ/A2VucJOgQ/C48S/zB8MMeMHSGKYpXhIjbPxfuezITkaBH1wqv00DDQ==",
+      "integrity": "sha512-aY/R+aEsRelme17KGQa/1ZSIpLpNYYrhcrepKTZgE+W3WM16YMCaPwOHLHsmopZHELU0Ojin1lPVxKR0MihncA==",
       "license": "BlueOak-1.0.0",
-      "resolved": "https://registry.npmjs.org/lru-cache/-/lru-cache-11.2.6.tgz",
-      "version": "11.2.6"
+      "resolved": "https://registry.npmjs.org/lru-cache/-/lru-cache-11.2.7.tgz",
+      "version": "11.2.7"
     },
     "node_modules/math-intrinsics": {
       "engines": {
@@ -3448,27 +3408,27 @@ install(false);
     },
     "node_modules/minimatch": {
       "dependencies": {
-        "brace-expansion": "^5.0.2"
+        "brace-expansion": "^5.0.5"
       },
       "engines": {
-        "node": "20 || >=22"
+        "node": "18 || 20 || >=22"
       },
       "funding": {
         "url": "https://github.com/sponsors/isaacs"
       },
-      "integrity": "sha512-ugkC31VaVg9cF0DFVoADH12k6061zNZkZON+aX8AWsR9GhPcErkcMBceb6znR8wLERM2AkkOxy2nWRLpT9Jq5w==",
+      "integrity": "sha512-MULkVLfKGYDFYejP07QOurDLLQpcjk7Fw+7jXS2R2czRQzR56yHRveU5NDJEOviH+hETZKSkIk5c+T23GjFUMg==",
       "license": "BlueOak-1.0.0",
-      "resolved": "https://registry.npmjs.org/minimatch/-/minimatch-10.2.0.tgz",
-      "version": "10.2.0"
+      "resolved": "https://registry.npmjs.org/minimatch/-/minimatch-10.2.5.tgz",
+      "version": "10.2.5"
     },
     "node_modules/minipass": {
       "engines": {
         "node": ">=16 || 14 >=14.17"
       },
-      "integrity": "sha512-qOOzS1cBTWYF4BH8fVePDBOO9iptMnGUEZwNc/cMWnTV2nVLZ7VoNWEPHkYczZA0pdoA7dl6e7FL659nX9S2aw==",
-      "license": "ISC",
-      "resolved": "https://registry.npmjs.org/minipass/-/minipass-7.1.2.tgz",
-      "version": "7.1.2"
+      "integrity": "sha512-tEBHqDnIoM/1rXME1zgka9g6Q2lcoCkxHLuc7ODJ5BxbP5d4c2Z5cGgtXAku59200Cx7diuHTOYfSBD8n6mm8A==",
+      "license": "BlueOak-1.0.0",
+      "resolved": "https://registry.npmjs.org/minipass/-/minipass-7.1.3.tgz",
+      "version": "7.1.3"
     },
     "node_modules/package-json-from-dist": {
       "integrity": "sha512-UEZIS3/by4OC8vL3P2dTXRETpebLI2NiI5vIrjaD/5UtrkFX/tNbwjTSRAGC/+7CAo2pIcBaRgWmcBBHcsaCIw==",
@@ -3482,15 +3442,15 @@ install(false);
         "minipass": "^7.1.2"
       },
       "engines": {
-        "node": "20 || >=22"
+        "node": "18 || 20 || >=22"
       },
       "funding": {
         "url": "https://github.com/sponsors/isaacs"
       },
-      "integrity": "sha512-oWyT4gICAu+kaA7QWk/jvCHWarMKNs6pXOGWKDTr7cw4IGcUbW+PeTfbaQiLGheFRpjo6O9J0PmyMfQPjH71oA==",
+      "integrity": "sha512-3O/iVVsJAPsOnpwWIeD+d6z/7PmqApyQePUtCndjatj/9I5LylHvt5qluFaBT3I5h3r1ejfR056c+FCv+NnNXg==",
       "license": "BlueOak-1.0.0",
-      "resolved": "https://registry.npmjs.org/path-scurry/-/path-scurry-2.0.1.tgz",
-      "version": "2.0.1"
+      "resolved": "https://registry.npmjs.org/path-scurry/-/path-scurry-2.0.2.tgz",
+      "version": "2.0.2"
     },
     "node_modules/prettier": {
       "bin": {
@@ -3509,10 +3469,13 @@ install(false);
       "version": "3.8.1"
     },
     "node_modules/proxy-from-env": {
-      "integrity": "sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==",
+      "engines": {
+        "node": ">=10"
+      },
+      "integrity": "sha512-cJ+oHTW1VAEa8cJslgmUZrc+sjRKgAKl3Zyse6+PV38hZe/V6Z14TbCuXcan9F9ghlz4QrFr2c92TNF82UkYHA==",
       "license": "MIT",
-      "resolved": "https://registry.npmjs.org/proxy-from-env/-/proxy-from-env-1.1.0.tgz",
-      "version": "1.1.0"
+      "resolved": "https://registry.npmjs.org/proxy-from-env/-/proxy-from-env-2.1.0.tgz",
+      "version": "2.1.0"
     },
     "node_modules/rimraf": {
       "bin": {
@@ -3532,15 +3495,6 @@ install(false);
       "license": "BlueOak-1.0.0",
       "resolved": "https://registry.npmjs.org/rimraf/-/rimraf-6.1.3.tgz",
       "version": "6.1.3"
-    },
-    "node_modules/tunnel": {
-      "engines": {
-        "node": ">=0.6.11 <=0.7.0 || >=0.7.3"
-      },
-      "integrity": "sha512-1h/Lnq9yajKY2PEbBadPXj3VxsDDu844OnaAo52UVmIzIvwwtBPIuNvkjuzBlTWpfJyUbG3ez0KSBibQkj4ojg==",
-      "license": "MIT",
-      "resolved": "https://registry.npmjs.org/tunnel/-/tunnel-0.0.6.tgz",
-      "version": "0.0.6"
     },
     "node_modules/wcwidth": {
       "dependencies": {
@@ -3567,7 +3521,6 @@ install(false);
   },
   "dependencies": {
     "axios": "^1.13.5",
-    "axios-proxy-builder": "^0.1.2",
     "console.table": "^0.10.0",
     "detect-libc": "^2.1.2",
     "rimraf": "^6.1.3"

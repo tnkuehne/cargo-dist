@@ -72,7 +72,7 @@ class Package {
     return true;
   }
 
-  install(fetchOptions, suppressLogs = false) {
+  install(suppressLogs = false) {
     if (this.exists()) {
       if (!suppressLogs) {
         console.error(
@@ -92,7 +92,7 @@ class Package {
       console.error(`Downloading release from ${this.url}`);
     }
 
-    return axios({ ...fetchOptions, url: this.url, responseType: "stream" })
+    return axios({ url: this.url, responseType: "stream" })
       .then((res) => {
         return new Promise((resolve, reject) => {
           mkdtemp(`${tmpDir}${sep}`, (err, directory) => {
@@ -178,9 +178,9 @@ class Package {
       });
   }
 
-  run(binaryName, fetchOptions) {
+  run(binaryName) {
     const promise = !this.exists()
-      ? this.install(fetchOptions, true)
+      ? this.install(true)
       : Promise.resolve();
 
     promise
